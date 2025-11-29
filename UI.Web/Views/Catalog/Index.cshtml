@@ -1,0 +1,206 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using NowakowskaWrobel.Smartphones.CORE
+@model NowakowskaWrobel.Smartphones.UI.Web.Models.CatalogPageViewModel
+
+<h1>Katalog smartfonow</h1>
+
+@if (TempData["ProducerError"] != null)
+{
+    <div class="alert alert-warning">@TempData["ProducerError"]</div>
+}
+
+@if (TempData["SmartphoneError"] != null)
+{
+    <div class="alert alert-warning">@TempData["SmartphoneError"]</div>
+}
+
+<section class="filters mb-3">
+    <form asp-action="Index" method="get" class="row g-2">
+        <div class="col-sm-2">
+            <label class="form-label">Model</label>
+            <input class="form-control" type="text" name="search" value="@Model.Search" placeholder="Szukaj modelu" />
+        </div>
+        <div class="col-sm-2">
+            <label class="form-label">System</label>
+            <select class="form-select" name="os">
+                <option value="">Dowolny</option>
+                @foreach (var os in Enum.GetValues<SmartphoneOs>())
+                {
+                    <option value="@os" selected="@(Model.OperatingSystem == os ? "selected" : null)">@os</option>
+                }
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <label class="form-label">Producent</label>
+            <select class="form-select" name="producerId">
+                <option value="">Dowolny</option>
+                @foreach (var p in Model.Producers)
+                {
+                    <option value="@p.Id" selected="@(Model.ProducerId == p.Id ? "selected" : null)">@p.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <label class="form-label">Cena min</label>
+            <input class="form-control" type="number" step="0.01" name="minPrice" value="@(Model.MinPrice?.ToString() ?? string.Empty)" />
+        </div>
+        <div class="col-sm-2">
+            <label class="form-label">Cena max</label>
+            <input class="form-control" type="number" step="0.01" name="maxPrice" value="@(Model.MaxPrice?.ToString() ?? string.Empty)" />
+        </div>
+        <div class="col-sm-2 align-self-end">
+            <button type="submit" class="btn btn-primary me-2">Filtruj</button>
+            <a class="btn btn-secondary" asp-action="Index">Wyczysc</a>
+        </div>
+    </form>
+</section>
+
+<section class="producers mb-5">
+    <h2>Producenci</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nazwa</th>
+                <th>Kraj</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model.Producers)
+            {
+                <tr>
+                    <td>@p.Id</td>
+                    <td>@p.Name</td>
+                    <td>@p.Country</td>
+                    <td class="d-flex gap-2">
+                        <a class="btn btn-sm btn-outline-primary" asp-action="Index" asp-route-editProducerId="@p.Id">Edytuj</a>
+                        <form asp-action="DeleteProducer" method="post" onsubmit="return confirm('Usun producenta?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@p.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Usun</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title">@((Model.ProducerForm.Id == 0) ? "Dodaj producenta" : "Edytuj producenta")</h3>
+            <form asp-action="SaveProducer" method="post" class="row g-3">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="ProducerForm.Id" />
+                <div class="col-md-4">
+                    <label asp-for="ProducerForm.Name" class="form-label"></label>
+                    <input asp-for="ProducerForm.Name" class="form-control" />
+                    <span asp-validation-for="ProducerForm.Name" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="ProducerForm.Country" class="form-label"></label>
+                    <input asp-for="ProducerForm.Country" class="form-control" />
+                    <span asp-validation-for="ProducerForm.Country" class="text-danger"></span>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-success">Zapisz producenta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section class="smartphones">
+    <h2>Smartfony</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Model</th>
+                <th>OS</th>
+                <th>Cena</th>
+                <th>Ekran</th>
+                <th>RAM</th>
+                <th>Pamiec</th>
+                <th>Producent</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model.Smartphones)
+            {
+                <tr>
+                    <td>@s.Id</td>
+                    <td>@s.ModelName</td>
+                    <td>@s.OperatingSystem</td>
+                    <td>@s.Price</td>
+                    <td>@s.ScreenSize</td>
+                    <td>@s.RamGb</td>
+                    <td>@s.StorageGb</td>
+                    <td>@s.Producer?.Name</td>
+                    <td class="d-flex gap-2">
+                        <a class="btn btn-sm btn-outline-primary" asp-action="Index" asp-route-editSmartphoneId="@s.Id">Edytuj</a>
+                        <form asp-action="DeleteSmartphone" method="post" onsubmit="return confirm('Usun smartfon?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@s.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Usun</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title">@((Model.SmartphoneForm.Id == 0) ? "Dodaj smartfon" : "Edytuj smartfon")</h3>
+            <form asp-action="SaveSmartphone" method="post" class="row g-3">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="SmartphoneForm.Id" />
+                <div class="col-md-4">
+                    <label asp-for="SmartphoneForm.ModelName" class="form-label"></label>
+                    <input asp-for="SmartphoneForm.ModelName" class="form-control" />
+                    <span asp-validation-for="SmartphoneForm.ModelName" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="SmartphoneForm.OperatingSystem" class="form-label"></label>
+                    <select asp-for="SmartphoneForm.OperatingSystem" class="form-select" asp-items="Html.GetEnumSelectList<SmartphoneOs>()"></select>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="SmartphoneForm.Price" class="form-label"></label>
+                    <input asp-for="SmartphoneForm.Price" class="form-control" />
+                    <span asp-validation-for="SmartphoneForm.Price" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="SmartphoneForm.ScreenSize" class="form-label"></label>
+                    <input asp-for="SmartphoneForm.ScreenSize" class="form-control" />
+                    <span asp-validation-for="SmartphoneForm.ScreenSize" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="SmartphoneForm.RamGb" class="form-label"></label>
+                    <input asp-for="SmartphoneForm.RamGb" class="form-control" />
+                    <span asp-validation-for="SmartphoneForm.RamGb" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="SmartphoneForm.StorageGb" class="form-label"></label>
+                    <input asp-for="SmartphoneForm.StorageGb" class="form-control" />
+                    <span asp-validation-for="SmartphoneForm.StorageGb" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="SmartphoneForm.ProducerId" class="form-label">Producent</label>
+                    <select asp-for="SmartphoneForm.ProducerId" class="form-select" asp-items='@(new SelectList(Model.Producers, "Id", "Name", Model.SmartphoneForm.ProducerId))'>
+                        <option value="">Brak</option>
+                    </select>
+                    <span asp-validation-for="SmartphoneForm.ProducerId" class="text-danger"></span>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-success">Zapisz smartfon</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

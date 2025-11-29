@@ -1,0 +1,190 @@
+<Window x:Class="NowakowskaWrobel.Smartphones.UI.Desktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Katalog smartfonow"
+        Height="650"
+        Width="1000">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Lista PRODUCENTOW -->
+        <DataGrid Grid.Row="0"
+                  ItemsSource="{Binding Producers}"
+                  SelectedItem="{Binding SelectedProducer, Mode=TwoWay}"
+                  AutoGenerateColumns="False"
+                  Height="150"
+                  Margin="0,0,0,5">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID"
+                                    Binding="{Binding Id}"
+                                    IsReadOnly="True"
+                                    Width="50"/>
+                <DataGridTextColumn Header="Nazwa"
+                                    Binding="{Binding Name}"
+                                    Width="*"/>
+                <DataGridTextColumn Header="Kraj"
+                                    Binding="{Binding Country}"
+                                    Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Przyciski PRODUCENTOW -->
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,0,0,10">
+            <Button Content="Dodaj producenta"
+                    Width="130"
+                    Margin="0,0,5,0"
+                    Command="{Binding AddProducerCommand}"/>
+            <Button Content="Zapisz producenta"
+                    Width="130"
+                    Margin="0,0,5,0"
+                    Command="{Binding SaveProducerCommand}"/>
+            <Button Content="Usun producenta"
+                    Width="130"
+                    Command="{Binding DeleteProducerCommand}"/>
+        </StackPanel>
+
+        <!-- Pasek filtrowania SMARTFONOW -->
+        <StackPanel Orientation="Horizontal"
+                    Grid.Row="2"
+                    Margin="0,0,0,10"
+                    VerticalAlignment="Center"
+                    SnapsToDevicePixels="True">
+            <TextBlock Text="Model:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,5,0"/>
+            <TextBox Width="150"
+                     Margin="0,0,10,0"
+                     Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <TextBlock Text="OS:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,5,0"/>
+            <ComboBox Width="120"
+                      Margin="0,0,10,0"
+                      ItemsSource="{Binding OperatingSystems}"
+                      SelectedItem="{Binding FilterOperatingSystem, Mode=TwoWay}"
+                      SelectedIndex="-1"/>
+
+            <TextBlock Text="Producent:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,5,0"/>
+            <ComboBox Width="150"
+                      Margin="0,0,10,0"
+                      ItemsSource="{Binding Producers}"
+                      SelectedItem="{Binding FilterProducer, Mode=TwoWay}"
+                      DisplayMemberPath="Name"
+                      SelectedIndex="-1"/>
+
+            <TextBlock Text="Cena min:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,5,0"/>
+            <TextBox Width="80"
+                     Margin="0,0,10,0"
+                     Text="{Binding MinPriceText, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <TextBlock Text="max:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,5,0"/>
+            <TextBox Width="80"
+                     Margin="0,0,10,0"
+                     Text="{Binding MaxPriceText, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <Button Content="Wyczysc filtry"
+                    Width="120"
+                    Command="{Binding ClearFiltersCommand}"/>
+        </StackPanel>
+
+        <!-- Lista SMARTFONOW -->
+        <DataGrid Grid.Row="3"
+                  ItemsSource="{Binding Smartphones}"
+                  SelectedItem="{Binding SelectedSmartphone, Mode=TwoWay}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID"
+                                    Binding="{Binding Id}"
+                                    IsReadOnly="True"
+                                    Width="50"/>
+                <DataGridTextColumn Header="Model"
+                                    Binding="{Binding ModelName, Mode=TwoWay}"
+                                    Width="2*"/>
+                <DataGridComboBoxColumn Header="OS"
+                                        SelectedItemBinding="{Binding OperatingSystem, Mode=TwoWay}"
+                                        Width="100">
+                    <DataGridComboBoxColumn.ElementStyle>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="ItemsSource"
+                                    Value="{Binding DataContext.OperatingSystems, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            <Setter Property="IsHitTestVisible" Value="False"/>
+                            <Setter Property="Focusable" Value="False"/>
+                        </Style>
+                    </DataGridComboBoxColumn.ElementStyle>
+                    <DataGridComboBoxColumn.EditingElementStyle>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="ItemsSource"
+                                    Value="{Binding DataContext.OperatingSystems, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                        </Style>
+                    </DataGridComboBoxColumn.EditingElementStyle>
+                </DataGridComboBoxColumn>
+                <DataGridTextColumn Header="Cena"
+                                    Binding="{Binding Price, Mode=TwoWay}"
+                                    Width="80"/>
+                <DataGridTextColumn Header="Ekran"
+                                    Binding="{Binding ScreenSize, Mode=TwoWay}"
+                                    Width="80"/>
+                <DataGridTextColumn Header="RAM"
+                                    Binding="{Binding RamGb, Mode=TwoWay}"
+                                    Width="60"/>
+                <DataGridTextColumn Header="Pamiec"
+                                    Binding="{Binding StorageGb, Mode=TwoWay}"
+                                    Width="80"/>
+                <DataGridComboBoxColumn Header="Producent"
+                                        SelectedItemBinding="{Binding Producer, Mode=TwoWay}"
+                                        DisplayMemberPath="Name"
+                                        Width="2*">
+                    <DataGridComboBoxColumn.ElementStyle>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="ItemsSource"
+                                    Value="{Binding DataContext.Producers, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            <Setter Property="IsHitTestVisible" Value="False"/>
+                            <Setter Property="Focusable" Value="False"/>
+                        </Style>
+                    </DataGridComboBoxColumn.ElementStyle>
+                    <DataGridComboBoxColumn.EditingElementStyle>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="ItemsSource"
+                                    Value="{Binding DataContext.Producers, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                        </Style>
+                    </DataGridComboBoxColumn.EditingElementStyle>
+                </DataGridComboBoxColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Przyciski SMARTFONOW -->
+        <StackPanel Grid.Row="4"
+                    Orientation="Horizontal"
+                    Margin="0,10,0,0"
+                    HorizontalAlignment="Right">
+            <Button Content="Dodaj"
+                    Width="80"
+                    Margin="0,0,5,0"
+                    Command="{Binding AddSmartphoneCommand}"/>
+            <Button Content="Zapisz"
+                    Width="80"
+                    Margin="0,0,5,0"
+                    Command="{Binding SaveSmartphoneCommand}"/>
+            <Button Content="Usun"
+                    Width="80"
+                    Command="{Binding DeleteSmartphoneCommand}"/>
+        </StackPanel>
+    </Grid>
+</Window>
